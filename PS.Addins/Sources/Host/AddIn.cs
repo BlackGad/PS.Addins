@@ -6,8 +6,18 @@ namespace PS.Addins.Host
     {
         #region Constructors
 
-        public AddIn(Version version)
+        public AddIn(Version version,
+                     string assemblyPath,
+                     string addinTypeName,
+                     Type[] supportedContracts)
         {
+            if (version == null) throw new ArgumentNullException(nameof(version));
+            if (assemblyPath == null) throw new ArgumentNullException(nameof(assemblyPath));
+            if (addinTypeName == null) throw new ArgumentNullException(nameof(addinTypeName));
+
+            AssemblyPath = assemblyPath;
+            AddinTypeName = addinTypeName;
+            SupportedContracts = supportedContracts;
             Version = version;
         }
 
@@ -15,16 +25,13 @@ namespace PS.Addins.Host
 
         #region Properties
 
+        public string AddinTypeName { get; }
+
+        public string AssemblyPath { get; }
+
+        public Type[] SupportedContracts { get; }
+
         public Version Version { get; }
-
-        #endregion
-
-        #region Members
-
-        public AddInInstance Create()
-        {
-            return new AddInInstance();
-        }
 
         #endregion
     }

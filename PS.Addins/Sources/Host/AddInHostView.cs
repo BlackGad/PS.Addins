@@ -6,7 +6,7 @@ using System.Reflection.Emit;
 
 namespace PS.Addins.Host
 {
-    class AddInHostView
+    public class AddInHostView
     {
         #region Constants
 
@@ -19,7 +19,6 @@ namespace PS.Addins.Host
 
         #region Static members
 
-        /// <summary>
         /*
         interface IContract
         {
@@ -62,8 +61,10 @@ namespace PS.Addins.Host
             }
         }
         */
+
+        /// <summary>
         /// </summary>
-        private static Type GenerateHostSideAdapterType(Type contractInterfaceType, Dictionary<MethodInfo, string> map)
+        private static Type GenerateAddInHostViewProxyType(Type contractInterfaceType, Dictionary<MethodInfo, string> map)
         {
             var assemblyName = new AssemblyName($"{contractInterfaceType.Name}_{Guid.NewGuid().ToString("N")}");
             var assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
@@ -187,24 +188,25 @@ namespace PS.Addins.Host
             DefaultObjectConstructorInfo = typeof(object).GetConstructor(Type.EmptyTypes);
         }
 
-        public AddInHostView(Type contractType)
+        internal AddInHostView(Type contractType)
         {
             ContractType = contractType;
 
             var methodMap = contractType.GetMethods().ToDictionary(m => m, m => Guid.NewGuid().ToString("N"));
             ContractMethodsMap = methodMap.ToDictionary(p => p.Value, p => p.Key);
 
-            HostSideAdapterType = GenerateHostSideAdapterType(contractType, methodMap);
+            AddInHostViewProxyType = GenerateAddInHostViewProxyType(contractType, methodMap);
         }
 
         #endregion
 
         #region Properties
 
-        public IReadOnlyDictionary<string, MethodInfo> ContractMethodsMap { get; }
+        public Type AddInHostViewProxyType { get; }
 
         public Type ContractType { get; }
-        public Type HostSideAdapterType { get; }
+
+        internal IReadOnlyDictionary<string, MethodInfo> ContractMethodsMap { get; }
 
         #endregion
     }

@@ -40,8 +40,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Sources\Adapters\SingleDomain\AddInSidesAdapterSingleDomain.cs" />
     <Compile Include="Sources\Host\AddInHost.cs" />
     <Compile Include="Sources\Host\AddIn.cs" />
+    <Compile Include="Sources\Adapters\Base\AddInSidesAdapter.cs" />
     <Compile Include="Sources\Host\AddInInstance.cs" />
     <Compile Include="Sources\Host\AddInHostView.cs" />
     <Compile Include="Sources\Cache.cs" />

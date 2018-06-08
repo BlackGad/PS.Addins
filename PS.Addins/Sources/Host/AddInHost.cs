@@ -1,17 +1,19 @@
 ﻿using System;
+using PS.Addins.Adapters.Base;
 
 namespace PS.Addins.Host
 {
     public class AddInHost
+    {
+        #region Members
+
+        public AddInInstance Create(AddIn addIn, AddInSidesAdapter addInSidesAdapter)
         {
-            #region Members
-
-            public AddIn[] FindAddIns()
-            {
-                return new[] { new AddIn(new Version(1, 0)) };
-            }
-
-            #endregion
+            return new AddInInstance(addIn, addInSidesAdapter);
         }
-    
+
+        
+
+        #endregion
+    }
 }

@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Linq;
 using Contracts;
-using PS.Addins;
+using PS.Addins.Adapters.SingleDomain;
 using PS.Addins.Host;
 
 namespace Host
@@ -16,11 +15,20 @@ namespace Host
             {
                 var addInHost = new AddInHost();
                 //TODO: setup discovery
-                var addins = addInHost.FindAddIns();
+                //var addins = addInHost.FindAddIns();
 
-                using (var addin = addins.First().Create())
+                var addin = new AddIn(new Version(1, 0),
+                                      @"d:\GitHub\PS.Addins\AddIn1\bin\Debug\AddIn1.dll",
+                                      "AddIn1.Addin",
+                                      new[]
+                                      {
+                                          typeof(ITestContract)
+                                      });
+
+                using (var adapter = new AddInSidesAdapterSingleDomain())
+                using (var addInInstance = addInHost.Create(addin, adapter))
                 {
-                    var facade = addin.Contract<ITestContract>();
+                    var facade = addInInstance.Contract<ITestContract>();
                     EventHandler eventHandler = (sender, eventArgs) => { };
 
                     Console.WriteLine("Attaching event handler...");
@@ -48,7 +56,6 @@ namespace Host
             {
                 Console.WriteLine(e.GetBaseException());
             }
-
 
             Console.ReadLine();
         }

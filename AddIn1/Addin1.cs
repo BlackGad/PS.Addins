@@ -3,7 +3,7 @@ using Contracts;
 
 namespace AddIn1
 {
-    class Addin1 : ITestContract
+    class Addin : ITestContract
     {
         #region ITestContract Members
 
