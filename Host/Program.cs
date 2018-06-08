@@ -20,7 +20,7 @@ namespace Host
 
                 using (var addin = addins.First().Create())
                 {
-                    var facade = addin.Facade<ITestContract>();
+                    var facade = addin.Contract<ITestContract>();
                     EventHandler eventHandler = (sender, eventArgs) => { };
 
                     Console.WriteLine("Attaching event handler...");

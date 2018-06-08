@@ -13,7 +13,7 @@ namespace PS.Addins.Host
 
         #endregion
 
-        private readonly Cache<Type, object> _facadeCache;
+        private readonly Cache<Type, object> _contractFacadeCache;
 
         #region Constructors
 
@@ -24,7 +24,7 @@ namespace PS.Addins.Host
 
         internal AddInInstance()
         {
-            _facadeCache = new Cache<Type, object>();
+            _contractFacadeCache = new Cache<Type, object>();
         }
 
         #endregion
@@ -39,12 +39,12 @@ namespace PS.Addins.Host
 
         #region Members
 
-        public T Facade<T>()
+        public T Contract<T>()
         {
-            return (T)_facadeCache.Query(typeof(T), CreateFacade);
+            return (T)_contractFacadeCache.Query(typeof(T), CreateContractFacade);
         }
 
-        private object CreateFacade(Type contractType)
+        private object CreateContractFacade(Type contractType)
         {
             var addInHostView = HostProxyTypesCache.Query(contractType, key => new AddInHostView(key));
             var callBack = new Func<string, object[], object>((id, args) => ProxyCallback(addInHostView, addInHostView.ContractMethodsMap[id], args));
