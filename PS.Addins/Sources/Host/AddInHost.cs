@@ -1,5 +1,4 @@
-﻿using System;
-using PS.Addins.Adapters.Base;
+﻿using PS.Addins.Adapters.Base;
 
 namespace PS.Addins.Host
 {
@@ -9,10 +8,8 @@ namespace PS.Addins.Host
 
         public AddInInstance Create(AddIn addIn, AddInSidesAdapter addInSidesAdapter)
         {
-            return new AddInInstance(addIn, addInSidesAdapter);
+            return new AddInInstance(addIn, addInSidesAdapter.Instantiate(addIn));
         }
-
-        
 
         #endregion
     }

@@ -14,10 +14,8 @@ namespace PS.Addins.Host
         #endregion
 
         private readonly AddIn _addIn;
-
+        private readonly AddInHostSideAdapter _addInHostSideAdapter;
         private readonly Cache<Type, object> _contractFacadeCache;
-        private readonly Guid _instanceID;
-        private readonly AddInSidesAdapter _sidesAdapter;
 
         #region Constructors
 
@@ -26,14 +24,13 @@ namespace PS.Addins.Host
             AddInHostViewFacadeTypesCache = new Cache<Type, AddInHostView>();
         }
 
-        internal AddInInstance(AddIn addIn, AddInSidesAdapter sidesAdapter)
+        internal AddInInstance(AddIn addIn, AddInHostSideAdapter addInHostSideAdapter)
         {
             if (addIn == null) throw new ArgumentNullException(nameof(addIn));
-            if (sidesAdapter == null) throw new ArgumentNullException(nameof(sidesAdapter));
+            if (addInHostSideAdapter == null) throw new ArgumentNullException(nameof(addInHostSideAdapter));
 
-            _instanceID = sidesAdapter.Instantiate(addIn);
             _addIn = addIn;
-            _sidesAdapter = sidesAdapter;
+            _addInHostSideAdapter = addInHostSideAdapter;
             _contractFacadeCache = new Cache<Type, object>();
         }
 
@@ -43,7 +40,7 @@ namespace PS.Addins.Host
 
         public void Dispose()
         {
-            _sidesAdapter.Shutdown(_instanceID);
+            _addInHostSideAdapter.Dispose();
         }
 
         #endregion
@@ -58,10 +55,9 @@ namespace PS.Addins.Host
         private object CreateContractFacade(Type contractType)
         {
             var addInHostView = AddInHostViewFacadeTypesCache.Query(contractType, key => new AddInHostView(key));
-            var callBack = new Func<string, object[], object>((id, args) => _sidesAdapter.HostFacadeCall(_instanceID,
-                                                                                                         addInHostView,
-                                                                                                         addInHostView.ContractMethodsMap[id],
-                                                                                                         args));
+            var callBack = new Func<string, object[], object>((id, args) => _addInHostSideAdapter.Call(contractType,
+                                                                                                       addInHostView.ContractMethodsMap[id],
+                                                                                                       args));
             return Activator.CreateInstance(addInHostView.AddInHostViewProxyType,
                                             BindingFlags.Instance | BindingFlags.Public,
                                             null,

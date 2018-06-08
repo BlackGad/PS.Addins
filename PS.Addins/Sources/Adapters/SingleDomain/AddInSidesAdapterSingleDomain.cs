@@ -9,7 +9,7 @@ namespace PS.Addins.Adapters.SingleDomain
     public class AddInSidesAdapterSingleDomain : AddInSidesAdapter
     {
         private readonly AppDomain _domain;
-        private readonly Cache<Guid, object> _instances;
+        private readonly Cache<AddInHostSideAdapter, object> _instances;
 
         #region Constructors
 
@@ -28,7 +28,7 @@ namespace PS.Addins.Adapters.SingleDomain
                 };
             }
             _domain = AppDomain.CreateDomain(Guid.NewGuid().ToString("N"), AppDomain.CurrentDomain.Evidence, setup);
-            _instances = new Cache<Guid, object>();
+            _instances = new Cache<AddInHostSideAdapter, object>();
         }
 
         #endregion
@@ -40,24 +40,29 @@ namespace PS.Addins.Adapters.SingleDomain
             AppDomain.Unload(_domain);
         }
 
-        public override Guid Instantiate(AddIn addIn)
+        public override AddInHostSideAdapter Instantiate(AddIn addIn)
         {
-            var instanceID = Guid.NewGuid();
+            var result = new AddInHostSideAdapterDelegate(OnHostFacadeCall, Shutdown);
+
             //TODO: Create addin side adapter and view. Instantiate with view instance.
-            //_instances.Query(instanceID, id => _domain.CreateInstanceFromAndUnwrap(addIn.AssemblyPath, addIn.AddinTypeName));
-            return instanceID;
+            //_instances.Query(result, id => AddIn side adapter);
+            return result;
         }
 
-        public override void Shutdown(Guid instanceId)
-        {
-            _instances.Remove(instanceId);
-        }
+        #endregion
 
-        protected override object OnHostFacadeCall(Guid instanceID, AddInHostView addInHostView, MethodInfo methodInfo, object[] args)
+        #region Members
+
+        private object OnHostFacadeCall(AddInHostSideAdapter addInHostSideAdapter, Type contractType, MethodInfo methodInfo, object[] args)
         {
             //TODO: Send and Receive data
             if (methodInfo.ReturnType == typeof(void)) return null;
             return methodInfo.ReturnType.GetSystemDefultValue();
+        }
+
+        private void Shutdown(AddInHostSideAdapter instanceId)
+        {
+            _instances.Remove(instanceId);
         }
 
         #endregion
