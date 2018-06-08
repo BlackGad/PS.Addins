@@ -14,9 +14,9 @@ namespace Host
         {
             try
             {
-                var manager = new AddInHost();
+                var addInHost = new AddInHost();
                 //TODO: setup discovery
-                var addins = manager.FindAddIns();
+                var addins = addInHost.FindAddIns();
 
                 using (var addin = addins.First().Create())
                 {
@@ -48,6 +48,7 @@ namespace Host
             {
                 Console.WriteLine(e.GetBaseException());
             }
+
 
             Console.ReadLine();
         }

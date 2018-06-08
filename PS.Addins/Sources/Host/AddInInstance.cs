@@ -22,7 +22,7 @@ namespace PS.Addins.Host
             HostProxyTypesCache = new Cache<Type, AddInHostView>();
         }
 
-        public AddInInstance()
+        internal AddInInstance()
         {
             _facadeCache = new Cache<Type, object>();
         }
@@ -46,12 +46,12 @@ namespace PS.Addins.Host
 
         private object CreateFacade(Type contractType)
         {
-            var descriptor = HostProxyTypesCache.Query(contractType, key => new AddInHostView(key));
-            var proxyAggregation = new AddInHostViewAggregation(descriptor, ProxyCallback);
-            return Activator.CreateInstance(descriptor.HostSideAdapterType,
+            var addInHostView = HostProxyTypesCache.Query(contractType, key => new AddInHostView(key));
+            var callBack = new Func<string, object[], object>((id, args) => ProxyCallback(addInHostView, addInHostView.ContractMethodsMap[id], args));
+            return Activator.CreateInstance(addInHostView.HostSideAdapterType,
                                             BindingFlags.Instance | BindingFlags.Public,
                                             null,
-                                            new object[] { proxyAggregation },
+                                            new object[] { callBack },
                                             CultureInfo.CurrentCulture);
         }
 
@@ -59,10 +59,9 @@ namespace PS.Addins.Host
         {
             //TODO: HSAdapter here
 
-
             if (methodInfo.ReturnType == typeof(void)) return null;
             var result = methodInfo.ReturnType.GetSystemDefultValue();
-            return result;
+            return methodInfo.ReturnType.HandleBoxing(result);
         }
 
         #endregion

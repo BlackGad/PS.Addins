@@ -44,7 +44,6 @@
     <Compile Include="Sources\Host\AddIn.cs" />
     <Compile Include="Sources\Host\AddInInstance.cs" />
     <Compile Include="Sources\Host\AddInHostView.cs" />
-    <Compile Include="Sources\Host\AddInHostViewAggregation.cs" />
     <Compile Include="Sources\Cache.cs" />
     <Compile Include="Extensions\TypeExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

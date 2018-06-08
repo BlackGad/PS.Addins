@@ -10,8 +10,9 @@ namespace PS.Addins.Host
     {
         #region Constants
 
-        private static readonly MethodInfo AddInHostViewAggregationCallMethodInfo;
-        private static readonly Type AddInHostViewAggregationType;
+        private static readonly MethodInfo CallBackInvokeMethodInfo;
+
+        private static readonly Type CallBackType;
         private static readonly ConstructorInfo DefaultObjectConstructorInfo;
 
         #endregion
@@ -28,18 +29,18 @@ namespace PS.Addins.Host
             var typeBuilder = moduleBuilder.DefineType(proxyTypeName);
             typeBuilder.AddInterfaceImplementation(contractInterfaceType);
 
-            var proxyFieldBuilder = typeBuilder.DefineField("_proxy", AddInHostViewAggregationType, FieldAttributes.Private);
+            var callbackFieldBuilder = typeBuilder.DefineField("_callback", CallBackType, FieldAttributes.Private);
 
             var constructorBuilder = typeBuilder.DefineConstructor(MethodAttributes.Public,
                                                                    CallingConventions.Standard,
-                                                                   new[] { AddInHostViewAggregationType });
+                                                                   new[] { CallBackType });
 
             var constructorIL = constructorBuilder.GetILGenerator();
             constructorIL.Emit(OpCodes.Ldarg_0);
             constructorIL.Emit(OpCodes.Call, DefaultObjectConstructorInfo);
             constructorIL.Emit(OpCodes.Ldarg_0);
             constructorIL.Emit(OpCodes.Ldarg_1);
-            constructorIL.Emit(OpCodes.Stfld, proxyFieldBuilder);
+            constructorIL.Emit(OpCodes.Stfld, callbackFieldBuilder);
             constructorIL.Emit(OpCodes.Ret);
 
             var methodMap = new Dictionary<string, MethodBuilder>();
@@ -78,12 +79,12 @@ namespace PS.Addins.Host
                 }
                 methodIL.Emit(OpCodes.Stloc, argumentsLocal);
 
-                var resultLocal = methodIL.DeclareLocal(typeof(Type));
+                var resultLocal = methodIL.DeclareLocal(typeof(object));
                 methodIL.Emit(OpCodes.Ldarg_0);
-                methodIL.Emit(OpCodes.Ldfld, proxyFieldBuilder);
+                methodIL.Emit(OpCodes.Ldfld, callbackFieldBuilder);
                 methodIL.Emit(OpCodes.Ldloc, currentMethodIdLocal);
                 methodIL.Emit(OpCodes.Ldloc, argumentsLocal);
-                methodIL.Emit(OpCodes.Callvirt, AddInHostViewAggregationCallMethodInfo);
+                methodIL.Emit(OpCodes.Callvirt, CallBackInvokeMethodInfo);
                 methodIL.Emit(OpCodes.Stloc, resultLocal);
 
                 if (returnType != typeof(void))
@@ -136,10 +137,10 @@ namespace PS.Addins.Host
 
         static AddInHostView()
         {
-            AddInHostViewAggregationType = typeof(AddInHostViewAggregation);
+            CallBackType = typeof(Func<string, object[], object>);
+            CallBackInvokeMethodInfo = CallBackType.GetMethod(nameof(Action.Invoke));
 
             DefaultObjectConstructorInfo = typeof(object).GetConstructor(Type.EmptyTypes);
-            AddInHostViewAggregationCallMethodInfo = AddInHostViewAggregationType.GetMethod(nameof(AddInHostViewAggregation.CallMethod));
         }
 
         public AddInHostView(Type contractType)

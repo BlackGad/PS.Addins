@@ -17,6 +17,20 @@ namespace PS.Addins.Extensions
             return type.IsValueType ? Activator.CreateInstance(type) : null;
         }
 
+        public static object HandleBoxing(this Type targetType, object value)
+        {
+            if (value?.GetType() == targetType) return value;
+
+            if (targetType.IsGenericType && targetType.GetGenericTypeDefinition() == typeof(Nullable<>) && value != null)
+            {
+                // ReSharper disable once AssignNullToNotNullAttribute
+                return Convert.ChangeType(value, Nullable.GetUnderlyingType(targetType));
+            }
+
+            if (targetType.IsValueType) return Convert.ChangeType(value, targetType);
+            return value;
+        }
+
         #endregion
     }
 }
