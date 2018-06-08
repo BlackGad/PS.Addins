@@ -19,6 +19,50 @@ namespace PS.Addins.Host
 
         #region Static members
 
+        /// <summary>
+        /*
+        interface IContract
+        {
+            int this[int index] { get; set; }
+            int Property { get; set; }
+            event EventHandler Event;
+            float Function(int first, string second);
+        }
+
+        class HostSideAdapter : IContract
+        {
+            private Func<string, object[], object> _callback;
+
+            public HostSideAdapter(Func<string,object[],object> callback)
+            {
+                _callback = callback;
+            }
+
+            public int this[int index]
+            {
+                get { return (int)_callback("id", new object[] { index }); }
+                set { _callback("id", new object[] { index, value }); }
+            }
+
+            public int Property
+            {
+                get { return (int)_callback("id", new object[] { }); }
+                set { _callback("id", new object[] { value }); }
+            }
+
+            event EventHandler IContract.Event
+            {
+                add { _callback("id", new object[] { value}); }
+                remove { _callback("id", new object[] { value}); }
+            }
+
+            public float Function(int first, string second)
+            {
+                return (float)_callback("id", new object[] { first, second });
+            }
+        }
+        */
+        /// </summary>
         private static Type GenerateHostSideAdapterType(Type contractInterfaceType, Dictionary<MethodInfo, string> map)
         {
             var assemblyName = new AssemblyName($"{contractInterfaceType.Name}_{Guid.NewGuid().ToString("N")}");
