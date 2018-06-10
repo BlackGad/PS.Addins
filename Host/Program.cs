@@ -1,5 +1,7 @@
 ﻿using System;
 using Contracts;
+using Contracts.AddInSide;
+using Contracts.HostSide;
 using PS.Addins.Adapters.SingleDomain;
 using PS.Addins.Host;
 
@@ -22,13 +24,13 @@ namespace Host
                                       "AddIn1.Addin",
                                       new[]
                                       {
-                                          typeof(ITestContract)
+                                          typeof(IHostViewContract)
                                       });
 
                 using (var adapter = new AddInSidesAdapterSingleDomain())
                 using (var addInInstance = addInHost.Create(addin, adapter))
                 {
-                    var facade = addInInstance.Contract<ITestContract>();
+                    var facade = addInInstance.Contract<IHostViewContract>();
                     EventHandler eventHandler = (sender, eventArgs) => { };
 
                     Console.WriteLine("Attaching event handler...");

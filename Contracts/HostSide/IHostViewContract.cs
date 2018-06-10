@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Contracts
+namespace Contracts.HostSide
 {
-    public interface ITestContract
+    public interface IHostViewContract
     {
         #region Properties
 
