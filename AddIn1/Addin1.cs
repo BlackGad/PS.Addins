@@ -1,11 +1,11 @@
 ﻿using System;
-using Contracts;
+using Contracts.AddInSide;
 
 namespace AddIn1
 {
-    class Addin : ITestContract
+    class Addin : IAddInViewContract
     {
-        #region ITestContract Members
+        #region Properties
 
         public int this[int index]
         {
@@ -14,7 +14,16 @@ namespace AddIn1
         }
 
         public int Property { get; set; }
+
+        #endregion
+
+        #region Events
+
         public event EventHandler Event;
+
+        #endregion
+
+        #region IAddInViewContract Members
 
         public float Function(int first, string second)
         {
