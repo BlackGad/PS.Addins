@@ -1,23 +1,44 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 
-namespace PS.Addins.Host
+namespace PS.Addins
 {
-    public class AddInHostView
+    public class ProxyProducer
     {
         #region Constants
 
-        private static readonly MethodInfo CallBackInvokeMethodInfo;
+        private static readonly Cache<Type, ProxyProducer> Cache;
 
+        private static readonly MethodInfo CallBackInvokeMethodInfo;
         private static readonly Type CallBackType;
         private static readonly ConstructorInfo DefaultObjectConstructorInfo;
 
         #endregion
 
         #region Static members
+
+        public static T Create<T>(Func<MethodInfo, object[], object> callBack)
+        {
+            return (T)Create(typeof(T), callBack);
+        }
+
+        public static object Create(Type type, Func<MethodInfo, object[], object> callBack)
+        {
+            if (!type.IsInterface) throw new NotSupportedException($"{type} must be interface type");
+
+            var producer = Cache.Query(type, t => new ProxyProducer(t));
+
+            var internalCallBack = new Func<string, object[], object>((id, args) => callBack?.Invoke(producer.MethodsMap[id], args));
+            return Activator.CreateInstance(producer.ProducerType,
+                                            BindingFlags.Instance | BindingFlags.Public,
+                                            null,
+                                            new object[] { internalCallBack },
+                                            CultureInfo.CurrentCulture);
+        }
 
         /*
         interface IContract
@@ -28,11 +49,11 @@ namespace PS.Addins.Host
             float Function(int first, string second);
         }
 
-        class HostSideAdapter : IContract
+        class ContractMock : IContract
         {
             private Func<string, object[], object> _callback;
 
-            public HostSideAdapter(Func<string,object[],object> callback)
+            public ContractMock(Func<string,object[],object> callback)
             {
                 _callback = callback;
             }
@@ -64,15 +85,15 @@ namespace PS.Addins.Host
 
         /// <summary>
         /// </summary>
-        private static Type GenerateAddInHostViewProxyType(Type contractInterfaceType, Dictionary<MethodInfo, string> map)
+        private static Type GenerateMockType(Type interfaceType, Dictionary<MethodInfo, string> map)
         {
-            var assemblyName = new AssemblyName($"{contractInterfaceType.Name}_{Guid.NewGuid().ToString("N")}");
+            var assemblyName = new AssemblyName($"{interfaceType.Name}_{Guid.NewGuid().ToString("N")}");
             var assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
             var moduleBuilder = assemblyBuilder.DefineDynamicModule("module");
 
-            var proxyTypeName = $"{contractInterfaceType.Name}_{Guid.NewGuid().ToString("N")}";
+            var proxyTypeName = $"{interfaceType.Name}_{Guid.NewGuid().ToString("N")}";
             var typeBuilder = moduleBuilder.DefineType(proxyTypeName);
-            typeBuilder.AddInterfaceImplementation(contractInterfaceType);
+            typeBuilder.AddInterfaceImplementation(interfaceType);
 
             var callbackFieldBuilder = typeBuilder.DefineField("_callback", CallBackType, FieldAttributes.Private);
 
@@ -89,7 +110,7 @@ namespace PS.Addins.Host
             constructorIL.Emit(OpCodes.Ret);
 
             var methodMap = new Dictionary<string, MethodBuilder>();
-            var contractMethods = contractInterfaceType.GetMethods();
+            var contractMethods = interfaceType.GetMethods();
             foreach (var method in contractMethods)
             {
                 var attributes = method.Attributes;
@@ -144,7 +165,7 @@ namespace PS.Addins.Host
                 methodMap.Add(method.Name, methodBuilder);
             }
 
-            foreach (var property in contractInterfaceType.GetProperties())
+            foreach (var property in interfaceType.GetProperties())
             {
                 var propertyBuilder = typeBuilder.DefineProperty(property.Name,
                                                                  property.Attributes,
@@ -160,7 +181,7 @@ namespace PS.Addins.Host
                     propertyBuilder.SetSetMethod(methodMap["set_" + property.Name]);
             }
 
-            foreach (var eventInfo in contractInterfaceType.GetEvents())
+            foreach (var eventInfo in interfaceType.GetEvents())
             {
                 var eventBuilder = typeBuilder.DefineEvent(eventInfo.Name,
                                                            eventInfo.Attributes,
@@ -180,33 +201,34 @@ namespace PS.Addins.Host
 
         #region Constructors
 
-        static AddInHostView()
+        static ProxyProducer()
         {
             CallBackType = typeof(Func<string, object[], object>);
             CallBackInvokeMethodInfo = CallBackType.GetMethod(nameof(Action.Invoke));
 
             DefaultObjectConstructorInfo = typeof(object).GetConstructor(Type.EmptyTypes);
+            Cache = new Cache<Type, ProxyProducer>();
         }
 
-        internal AddInHostView(Type contractType)
+        internal ProxyProducer(Type contractType)
         {
             ContractType = contractType;
 
             var methodMap = contractType.GetMethods().ToDictionary(m => m, m => Guid.NewGuid().ToString("N"));
-            ContractMethodsMap = methodMap.ToDictionary(p => p.Value, p => p.Key);
+            MethodsMap = methodMap.ToDictionary(p => p.Value, p => p.Key);
 
-            AddInHostViewProxyType = GenerateAddInHostViewProxyType(contractType, methodMap);
+            ProducerType = GenerateMockType(contractType, methodMap);
         }
 
         #endregion
 
         #region Properties
 
-        public Type AddInHostViewProxyType { get; }
-
         public Type ContractType { get; }
 
-        internal IReadOnlyDictionary<string, MethodInfo> ContractMethodsMap { get; }
+        public Type ProducerType { get; }
+
+        internal IReadOnlyDictionary<string, MethodInfo> MethodsMap { get; }
 
         #endregion
     }

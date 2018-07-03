@@ -6,18 +6,18 @@ using PS.Addins.Host;
 
 namespace PS.Addins.Adapters.SingleDomain
 {
-    public class AddInSidesAdapterSingleDomain : AddInSidesAdapter
+    public class AddInPipelineSingleDomain : AddInPipeline
     {
         private readonly AppDomain _domain;
         private readonly Cache<AddInHostSideAdapter, object> _instances;
 
         #region Constructors
 
-        public AddInSidesAdapterSingleDomain() : this(null)
+        public AddInPipelineSingleDomain() : this(null)
         {
         }
 
-        public AddInSidesAdapterSingleDomain(AppDomainSetup setup)
+        public AddInPipelineSingleDomain(AppDomainSetup setup)
         {
             if (setup == null)
             {

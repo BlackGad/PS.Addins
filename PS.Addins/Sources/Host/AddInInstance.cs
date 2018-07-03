@@ -1,28 +1,15 @@
 ﻿using System;
-using System.Globalization;
-using System.Reflection;
 using PS.Addins.Adapters.Base;
 
 namespace PS.Addins.Host
 {
     public class AddInInstance : IDisposable
     {
-        #region Constants
-
-        private static readonly Cache<Type, AddInHostView> AddInHostViewFacadeTypesCache;
-
-        #endregion
-
         private readonly AddIn _addIn;
         private readonly AddInHostSideAdapter _addInHostSideAdapter;
         private readonly Cache<Type, object> _contractFacadeCache;
 
         #region Constructors
-
-        static AddInInstance()
-        {
-            AddInHostViewFacadeTypesCache = new Cache<Type, AddInHostView>();
-        }
 
         internal AddInInstance(AddIn addIn, AddInHostSideAdapter addInHostSideAdapter)
         {
@@ -54,15 +41,7 @@ namespace PS.Addins.Host
 
         private object CreateContractFacade(Type contractType)
         {
-            var addInHostView = AddInHostViewFacadeTypesCache.Query(contractType, key => new AddInHostView(key));
-            var callBack = new Func<string, object[], object>((id, args) => _addInHostSideAdapter.Call(contractType,
-                                                                                                       addInHostView.ContractMethodsMap[id],
-                                                                                                       args));
-            return Activator.CreateInstance(addInHostView.AddInHostViewProxyType,
-                                            BindingFlags.Instance | BindingFlags.Public,
-                                            null,
-                                            new object[] { callBack },
-                                            CultureInfo.CurrentCulture);
+            return ProxyProducer.Create(contractType, (method, args) => _addInHostSideAdapter.Call(contractType, method, args));
         }
 
         #endregion

@@ -6,9 +6,9 @@ namespace PS.Addins.Host
     {
         #region Members
 
-        public AddInInstance Create(AddIn addIn, AddInSidesAdapter addInSidesAdapter)
+        public AddInInstance Create(AddIn addIn, AddInPipeline addInPipeline)
         {
-            return new AddInInstance(addIn, addInSidesAdapter.Instantiate(addIn));
+            return new AddInInstance(addIn, addInPipeline.Instantiate(addIn));
         }
 
         #endregion

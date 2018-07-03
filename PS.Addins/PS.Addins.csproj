@@ -40,21 +40,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Sources\ProxyConsumer.cs" />
+    <Compile Include="Sources\ProxyProducer.cs" />
     <Compile Include="Sources\Adapters\Base\AddInHostSideAdapter.cs" />
     <Compile Include="Sources\Adapters\Base\AddInHostSideAdapterDelegate.cs" />
-    <Compile Include="Sources\Adapters\SingleDomain\AddInSidesAdapterSingleDomain.cs" />
+    <Compile Include="Sources\Adapters\SingleDomain\AddInPipelineSingleDomain.cs" />
     <Compile Include="Sources\Host\AddInHost.cs" />
     <Compile Include="Sources\Host\AddIn.cs" />
-    <Compile Include="Sources\Adapters\Base\AddInSidesAdapter.cs" />
+    <Compile Include="Sources\Adapters\Base\AddInPipeline.cs" />
     <Compile Include="Sources\Host\AddInInstance.cs" />
-    <Compile Include="Sources\Host\AddInHostView.cs" />
     <Compile Include="Sources\Cache.cs" />
     <Compile Include="Extensions\TypeExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Sources\Addin\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -3,7 +3,7 @@ using PS.Addins.Host;
 
 namespace PS.Addins.Adapters.Base
 {
-    public abstract class AddInSidesAdapter : IDisposable
+    public abstract class AddInPipeline : IDisposable
     {
         #region IDisposable Members
 
@@ -23,5 +23,10 @@ namespace PS.Addins.Adapters.Base
         }
 
         #endregion
+    }
+
+    public interface IPipeline
+    {
+        
     }
 }
