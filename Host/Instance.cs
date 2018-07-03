@@ -1,9 +1,10 @@
 ﻿using System;
 using Contracts;
+using Contracts.HostSide;
 
 namespace Host
 {
-    class Instance : ITestContract
+    class Instance : IHostViewContract
     {
         #region ITestContract Members
 

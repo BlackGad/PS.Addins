@@ -1,5 +1,6 @@
 ﻿using System;
 using Contracts;
+using Contracts.HostSide;
 using PS.Addins;
 
 namespace Host
@@ -15,7 +16,7 @@ namespace Host
                 var remoteInstance = new Instance();
                 var consumer = ProxyConsumer.Create(remoteInstance);
 
-                var producer = ProxyProducer.Create<ITestContract>((info, args) => consumer.Consume(info, args));
+                var producer = ProxyProducer.Create<IHostViewContract>((info, args) => consumer.Consume(info, args));
 
                 EventHandler eventHandler = (sender, eventArgs) => { };
 
