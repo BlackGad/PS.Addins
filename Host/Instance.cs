@@ -1,5 +1,4 @@
 ﻿using System;
-using Contracts;
 using Contracts.HostSide;
 
 namespace Host

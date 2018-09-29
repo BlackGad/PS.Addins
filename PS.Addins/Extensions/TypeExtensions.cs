@@ -11,9 +11,9 @@ namespace PS.Addins.Extensions
         /// </summary>
         /// <param name="type">Given type.</param>
         /// <returns>Default type value.</returns>
-        public static object GetSystemDefultValue(this Type type)
+        public static object GetSystemDefaultValue(this Type type)
         {
-            if (type == null) throw new ArgumentNullException("type");
+            if (type == null) throw new ArgumentNullException(nameof(type));
             return type.IsValueType ? Activator.CreateInstance(type) : null;
         }
 

@@ -57,7 +57,7 @@ namespace PS.Addins.Adapters.SingleDomain
         {
             //TODO: Send and Receive data
             if (methodInfo.ReturnType == typeof(void)) return null;
-            return methodInfo.ReturnType.GetSystemDefultValue();
+            return methodInfo.ReturnType.GetSystemDefaultValue();
         }
 
         private void Shutdown(AddInHostSideAdapter instanceId)
