@@ -41,7 +41,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AddInSide\IAddInViewContract.cs" />
-    <Compile Include="Contract\IContract.cs" />
     <Compile Include="HostSide\IHostViewContract.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

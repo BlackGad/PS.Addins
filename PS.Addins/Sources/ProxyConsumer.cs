@@ -3,24 +3,31 @@ using System.Reflection;
 
 namespace PS.Addins
 {
-    public class ProxyConsumer
+    public class ProxyConsumer : IDisposable
     {
-        #region Static members
-
-        public static ProxyConsumer Create(object instance)
-        {
-            return new ProxyConsumer(instance);
-        }
-
-        #endregion
-
         private readonly object _instance;
 
         #region Constructors
 
-        private ProxyConsumer(object instance)
+        public ProxyConsumer(Type instanceType)
         {
-            _instance = instance ?? throw new ArgumentNullException(nameof(instance));
+            InstanceType = instanceType ?? throw new ArgumentNullException(nameof(instanceType));
+            _instance = Activator.CreateInstance(instanceType);
+        }
+
+        #endregion
+
+        #region Properties
+
+        public Type InstanceType { get; }
+
+        #endregion
+
+        #region IDisposable Members
+
+        public void Dispose()
+        {
+            if (_instance is IDisposable disposable) disposable.Dispose();
         }
 
         #endregion

@@ -1,9 +1,10 @@
 ﻿using System;
+using Contracts.AddInSide;
 using Contracts.HostSide;
 
 namespace Host
 {
-    class Instance : IHostViewContract
+    class Instance : IAddInViewContract
     {
         #region ITestContract Members
 
@@ -19,14 +20,11 @@ namespace Host
             set { }
         }
 
-        public event EventHandler Event
-        {
-            add { }
-            remove { }
-        }
+        public event EventHandler Event;
 
         public float Function(int first, string second)
         {
+            Event?.Invoke(this, EventArgs.Empty);
             return default(float);
         }
 
