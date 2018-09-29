@@ -22,6 +22,8 @@ namespace Contracts.HostSide
 
         float Function(int first, string second);
 
+        void RaiseEvent();
+
         #endregion
     }
 }

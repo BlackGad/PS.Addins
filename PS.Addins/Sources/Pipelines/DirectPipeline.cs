@@ -1,19 +1,20 @@
 ﻿using System;
-using System.Linq;
 using System.Reflection;
+using PS.Addins.Extensions;
 using PS.Addins.Pipelines.Base;
 
 namespace PS.Addins.Pipelines
 {
-    public class DirectPipeline<TInstance> : IDisposable, IPipeline
+    public class DirectPipeline<TInstance> : IDisposable,
+                                             IPipeline
     {
-        private readonly ProxyConsumer _consumer;
+        private readonly TInstance _instance;
 
         #region Constructors
 
         public DirectPipeline()
         {
-            _consumer = new ProxyConsumer(typeof(TInstance));
+            _instance = Activator.CreateInstance<TInstance>();
         }
 
         #endregion
@@ -22,33 +23,27 @@ namespace PS.Addins.Pipelines
 
         public void Dispose()
         {
-            _consumer.Dispose();
+            if (_instance is IDisposable disposable) disposable.Dispose();
+        }
+
+        #endregion
+
+        #region IPipeline Members
+
+        public T Facade<T>()
+        {
+            return ProxyType.Create<T>(ProducerCallback);
         }
 
         #endregion
 
         #region Members
 
-        public T Facade<T>()
+        private object ProducerCallback(MethodInfo method, object[] args)
         {
-            return ProxyProducer.Create<T>(ProducerCallback);
-        }
-
-        private object ProducerCallback(MethodInfo info, object[] args)
-        {
-            if (info.DeclaringType?.IsAssignableFrom(_consumer.InstanceType) != true)
-            {
-                var methodParams = info.GetParameters().Select(p => p.ParameterType).ToArray();
-                var consumerMethod = _consumer.InstanceType
-                                              .GetMethod(info.Name,
-                                                         BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
-                                                         null,
-                                                         methodParams,
-                                                         null);
-                info = consumerMethod ?? throw new InvalidCastException();
-            }
-
-            return _consumer.Consume(info, args);
+            return _instance.GetType()
+                            .GetSimilarMethod(method)
+                            .Invoke(_instance, args);
         }
 
         #endregion

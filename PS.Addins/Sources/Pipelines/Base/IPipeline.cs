@@ -1,6 +1,8 @@
-﻿namespace PS.Addins.Pipelines.Base
+﻿using System;
+
+namespace PS.Addins.Pipelines.Base
 {
-    public interface IPipeline
+    public interface IPipeline : IDisposable
     {
         #region Members
 

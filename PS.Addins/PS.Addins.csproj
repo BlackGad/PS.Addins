@@ -40,14 +40,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions\ObjectExtensions.cs" />
+    <Compile Include="Sources\Linq\Expressions\Extensions\ExpressionExtensions.cs" />
     <Compile Include="Sources\Pipelines\Base\IPipeline.cs" />
-    <Compile Include="Sources\ProxyConsumer.cs" />
-    <Compile Include="Sources\ProxyProducer.cs" />
+    <Compile Include="Sources\Pipelines\DomainPipeline\DomainPipelineClient.cs" />
+    <Compile Include="Sources\Pipelines\DomainPipeline\DomainPipelineDelegateIdentifier.cs" />
+    <Compile Include="Sources\Pipelines\DomainPipeline\DomainPipelineHostInvoker.cs" />
+    <Compile Include="Sources\ProxyType.cs" />
     <Compile Include="Sources\Cache.cs" />
     <Compile Include="Extensions\TypeExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Sources\Pipelines\DirectPipeline.cs" />
-    <Compile Include="Sources\Pipelines\DomainPipeline.cs" />
+    <Compile Include="Sources\Pipelines\DomainPipeline\DomainPipeline.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

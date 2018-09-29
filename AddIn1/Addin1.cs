@@ -30,6 +30,11 @@ namespace AddIn1
             throw new NotImplementedException();
         }
 
+        public void RaiseEvent()
+        {
+            throw new NotImplementedException();
+        }
+
         #endregion
     }
 }

@@ -7,11 +7,11 @@ using System.Reflection.Emit;
 
 namespace PS.Addins
 {
-    public class ProxyProducer
+    public class ProxyType
     {
         #region Constants
 
-        private static readonly Cache<Type, ProxyProducer> Cache;
+        private static readonly Cache<Type, ProxyType> Cache;
 
         private static readonly MethodInfo CallBackInvokeMethodInfo;
         private static readonly Type CallBackType;
@@ -30,7 +30,7 @@ namespace PS.Addins
         {
             if (!type.IsInterface) throw new NotSupportedException($"{type} must be interface type");
 
-            var producer = Cache.Query(type, t => new ProxyProducer(t));
+            var producer = Cache.Query(type, t => new ProxyType(t));
 
             var internalCallBack = new Func<string, object[], object>((id, args) => callBack?.Invoke(producer.MethodsMap[id], args));
             return Activator.CreateInstance(producer.ProducerType,
@@ -158,16 +158,16 @@ namespace PS.Addins
 
         #region Constructors
 
-        static ProxyProducer()
+        static ProxyType()
         {
             CallBackType = typeof(Func<string, object[], object>);
             CallBackInvokeMethodInfo = CallBackType.GetMethod(nameof(Action.Invoke));
 
             DefaultObjectConstructorInfo = typeof(object).GetConstructor(Type.EmptyTypes);
-            Cache = new Cache<Type, ProxyProducer>();
+            Cache = new Cache<Type, ProxyType>();
         }
 
-        internal ProxyProducer(Type contractType)
+        internal ProxyType(Type contractType)
         {
             ContractType = contractType;
 
