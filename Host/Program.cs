@@ -18,10 +18,12 @@ namespace Host
 
                 var producer = ProxyProducer.Create<IHostViewContract>((info, args) => consumer.Consume(info, args));
 
-                EventHandler eventHandler = (sender, eventArgs) => { };
+                void EventHandler(object sender, EventArgs eventArgs)
+                {
+                }
 
                 Console.WriteLine("Attaching event handler...");
-                producer.Event += eventHandler;
+                producer.Event += EventHandler;
                 Console.WriteLine("Done.");
 
                 Console.WriteLine("Setting property...");
@@ -37,7 +39,7 @@ namespace Host
                 Console.WriteLine("Indexer result: " + producer[0]);
 
                 Console.WriteLine("Detaching event handler...");
-                producer.Event -= eventHandler;
+                producer.Event -= EventHandler;
                 Console.WriteLine("Done.");
             }
             catch (Exception e)

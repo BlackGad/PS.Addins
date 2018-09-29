@@ -24,9 +24,4 @@ namespace PS.Addins.Adapters.Base
 
         #endregion
     }
-
-    public interface IPipeline
-    {
-        
-    }
 }

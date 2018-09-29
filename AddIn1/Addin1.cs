@@ -3,7 +3,7 @@ using Contracts.AddInSide;
 
 namespace AddIn1
 {
-    class Addin : IAddInViewContract
+    class Addin1 : IAddInViewContract
     {
         #region Properties
 
