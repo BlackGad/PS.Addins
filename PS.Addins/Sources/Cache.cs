@@ -21,8 +21,7 @@ namespace PS.Addins
 
         public TValue Query(TKey key)
         {
-            Lazy<TValue> result;
-            return _storage.TryGetValue(key, out result) ? result.Value : default(TValue);
+            return _storage.TryGetValue(key, out var result) ? result.Value : default(TValue);
         }
 
         public TValue Query(TKey key, Func<TKey, TValue> factory)
@@ -33,8 +32,7 @@ namespace PS.Addins
 
         public TValue Remove(TKey key)
         {
-            Lazy<TValue> removed;
-            return _storage.TryGetValue(key, out removed)
+            return _storage.TryGetValue(key, out var removed)
                 ? removed.Value
                 : default(TValue);
         }

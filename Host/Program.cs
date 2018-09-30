@@ -1,7 +1,6 @@
 ﻿using System;
-using Contracts;
 using Contracts.HostSide;
-using PS.Addins;
+using PS.Addins.Pipelines;
 
 namespace Host
 {
@@ -13,61 +12,30 @@ namespace Host
         {
             try
             {
-                var remoteInstance = new Instance();
-                var consumer = ProxyConsumer.Create(remoteInstance);
+                //var assemblyLocation = typeof(RemoteInstance).Assembly.Location;
+                //var typeName = typeof(RemoteInstance).FullName;
 
-                var producer = ProxyProducer.Create<IHostViewContract>((info, args) => consumer.Consume(info, args));
+                var service = new HostService();
 
-                EventHandler eventHandler = (sender, eventArgs) => { };
+                var assemblyLocation = @"d:\GitHub\PS.Addins\AddIn1\bin\Debug\AddIn1.dll";
+                var typeName = "AddIn1.AddIn1";
 
-                Console.WriteLine("Attaching event handler...");
-                producer.Event += eventHandler;
-                Console.WriteLine("Done.");
-
-                Console.WriteLine("Setting property...");
-                producer.Property = 1;
-                Console.WriteLine("Done.");
-
-                Console.WriteLine("Setting indexer...");
-                producer[0] = 1;
-                Console.WriteLine("Done.");
-
-                Console.WriteLine("Function result: " + producer.Function(2, "Hello"));
-                Console.WriteLine("Property result: " + producer.Property);
-                Console.WriteLine("Indexer result: " + producer[0]);
-
-                Console.WriteLine("Detaching event handler...");
-                producer.Event -= eventHandler;
-                Console.WriteLine("Done.");
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.GetBaseException());
-            }
-
-            /*
-            try
-            {
-                var addInHost = new AddInHost();
-                //TODO: setup discovery
-                //var addins = addInHost.FindAddIns();
-
-                var addin = new AddIn(new Version(1, 0),
-                                      @"d:\GitHub\PS.Addins\AddIn1\bin\Debug\AddIn1.dll",
-                                      "AddIn1.Addin",
-                                      new[]
-                                      {
-                                          typeof(ITestContract)
-                                      });
-
-                using (var adapter = new AddInPipelineSingleDomain())
-                using (var addInInstance = addInHost.Create(addin, adapter))
+                //using (var pipeline = new DirectPipeline())
+                using (var pipeline = new DomainPipeline())
                 {
-                    var facade = addInInstance.Contract<ITestContract>();
-                    EventHandler eventHandler = (sender, eventArgs) => { };
+                    var facade = pipeline.CreateObject<IHostViewContract>(assemblyLocation, typeName);
+
+                    void EventHandler(object sender, EventArgs eventArgs)
+                    {
+                        Console.WriteLine("Caught event, Domain: " + AppDomain.CurrentDomain.FriendlyName);
+                    }
 
                     Console.WriteLine("Attaching event handler...");
-                    facade.Event += eventHandler;
+                    facade.Event += EventHandler;
+                    Console.WriteLine("Done.");
+
+                    Console.WriteLine("Raising event...");
+                    facade.RaiseEvent();
                     Console.WriteLine("Done.");
 
                     Console.WriteLine("Setting property...");
@@ -82,8 +50,25 @@ namespace Host
                     Console.WriteLine("Property result: " + facade.Property);
                     Console.WriteLine("Indexer result: " + facade[0]);
 
+                    Console.WriteLine("Spawn object...");
+                    var spawned = facade.SpawnObject();
+                    Console.WriteLine("Done.");
+
+                    Console.WriteLine("Execute spawned object method");
+                    spawned.Test();
+                    Console.WriteLine("Done.");
+
                     Console.WriteLine("Detaching event handler...");
-                    facade.Event -= eventHandler;
+                    facade.Event -= EventHandler;
+                    Console.WriteLine("Done.");
+
+                    Console.WriteLine("Raising event...");
+                    facade.RaiseEvent();
+                    Console.WriteLine("Done.");
+
+                    Console.WriteLine("Starting service processing...");
+                    facade.SetService(service);
+                    facade.RaiseServiceCall();
                     Console.WriteLine("Done.");
                 }
             }
@@ -91,7 +76,7 @@ namespace Host
             {
                 Console.WriteLine(e.GetBaseException());
             }
-            */
+
             Console.ReadLine();
         }
 

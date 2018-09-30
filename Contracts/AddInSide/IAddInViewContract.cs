@@ -22,6 +22,14 @@ namespace Contracts.AddInSide
 
         float Function(int first, string second);
 
+        void RaiseEvent();
+
+        int RaiseServiceCall();
+
+        void SetService(IHostService service);
+
+        ISpawnedObject SpawnObject();
+
         #endregion
     }
 }

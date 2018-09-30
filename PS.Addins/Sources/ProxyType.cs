@@ -7,11 +7,11 @@ using System.Reflection.Emit;
 
 namespace PS.Addins
 {
-    public class ProxyProducer
+    public class ProxyType
     {
         #region Constants
 
-        private static readonly Cache<Type, ProxyProducer> Cache;
+        private static readonly Cache<Type, ProxyType> Cache;
 
         private static readonly MethodInfo CallBackInvokeMethodInfo;
         private static readonly Type CallBackType;
@@ -30,7 +30,7 @@ namespace PS.Addins
         {
             if (!type.IsInterface) throw new NotSupportedException($"{type} must be interface type");
 
-            var producer = Cache.Query(type, t => new ProxyProducer(t));
+            var producer = Cache.Query(type, t => new ProxyType(t));
 
             var internalCallBack = new Func<string, object[], object>((id, args) => callBack?.Invoke(producer.MethodsMap[id], args));
             return Activator.CreateInstance(producer.ProducerType,
@@ -40,58 +40,15 @@ namespace PS.Addins
                                             CultureInfo.CurrentCulture);
         }
 
-        /*
-        interface IContract
-        {
-            int this[int index] { get; set; }
-            int Property { get; set; }
-            event EventHandler Event;
-            float Function(int first, string second);
-        }
-
-        class ContractMock : IContract
-        {
-            private Func<string, object[], object> _callback;
-
-            public ContractMock(Func<string,object[],object> callback)
-            {
-                _callback = callback;
-            }
-
-            public int this[int index]
-            {
-                get { return (int)_callback("id", new object[] { index }); }
-                set { _callback("id", new object[] { index, value }); }
-            }
-
-            public int Property
-            {
-                get { return (int)_callback("id", new object[] { }); }
-                set { _callback("id", new object[] { value }); }
-            }
-
-            event EventHandler IContract.Event
-            {
-                add { _callback("id", new object[] { value}); }
-                remove { _callback("id", new object[] { value}); }
-            }
-
-            public float Function(int first, string second)
-            {
-                return (float)_callback("id", new object[] { first, second });
-            }
-        }
-        */
-
         /// <summary>
         /// </summary>
         private static Type GenerateMockType(Type interfaceType, Dictionary<MethodInfo, string> map)
         {
-            var assemblyName = new AssemblyName($"{interfaceType.Name}_{Guid.NewGuid().ToString("N")}");
+            var assemblyName = new AssemblyName($"{interfaceType.Name}_{Guid.NewGuid():N}");
             var assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
             var moduleBuilder = assemblyBuilder.DefineDynamicModule("module");
 
-            var proxyTypeName = $"{interfaceType.Name}_{Guid.NewGuid().ToString("N")}";
+            var proxyTypeName = $"{interfaceType.Name}_{Guid.NewGuid():N}";
             var typeBuilder = moduleBuilder.DefineType(proxyTypeName);
             typeBuilder.AddInterfaceImplementation(interfaceType);
 
@@ -201,16 +158,16 @@ namespace PS.Addins
 
         #region Constructors
 
-        static ProxyProducer()
+        static ProxyType()
         {
             CallBackType = typeof(Func<string, object[], object>);
             CallBackInvokeMethodInfo = CallBackType.GetMethod(nameof(Action.Invoke));
 
             DefaultObjectConstructorInfo = typeof(object).GetConstructor(Type.EmptyTypes);
-            Cache = new Cache<Type, ProxyProducer>();
+            Cache = new Cache<Type, ProxyType>();
         }
 
-        internal ProxyProducer(Type contractType)
+        internal ProxyType(Type contractType)
         {
             ContractType = contractType;
 

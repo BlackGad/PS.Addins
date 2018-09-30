@@ -41,8 +41,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AddInSide\IAddInViewContract.cs" />
-    <Compile Include="Contract\IContract.cs" />
+    <Compile Include="IHostService.cs" />
     <Compile Include="HostSide\IHostViewContract.cs" />
+    <Compile Include="ISpawnedObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using System.Reflection;
 
 namespace PS.Addins.Extensions
 {
@@ -6,14 +8,50 @@ namespace PS.Addins.Extensions
     {
         #region Static members
 
+        public static Type[] GetAssemblyTypes(this Assembly assembly)
+        {
+            if (assembly == null) throw new ArgumentNullException(nameof(assembly));
+            try
+            {
+                return assembly.GetTypes();
+            }
+            catch (ReflectionTypeLoadException e)
+            {
+                return e.Types;
+            }
+        }
+
+        public static MethodInfo GetSimilarMethod(this Type targetType, string methodName, Type[] parameters)
+        {
+            var consumerMethod = targetType.GetMethod(methodName,
+                                                      BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
+                                                      null,
+                                                      parameters,
+                                                      null);
+            return consumerMethod ?? throw new InvalidCastException();
+        }
+
+        public static MethodInfo GetSimilarMethod(this Type targetType, MethodInfo method)
+        {
+            if (method.DeclaringType?.IsAssignableFrom(targetType) == true) return method;
+
+            var methodParams = method.GetParameters().Select(p => p.ParameterType).ToArray();
+            var consumerMethod = targetType.GetMethod(method.Name,
+                                                      BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
+                                                      null,
+                                                      methodParams,
+                                                      null);
+            return consumerMethod ?? throw new InvalidCastException();
+        }
+
         /// <summary>
         ///     Gets type system default value. Default instance for value types, null for reference types
         /// </summary>
         /// <param name="type">Given type.</param>
         /// <returns>Default type value.</returns>
-        public static object GetSystemDefultValue(this Type type)
+        public static object GetSystemDefaultValue(this Type type)
         {
-            if (type == null) throw new ArgumentNullException("type");
+            if (type == null) throw new ArgumentNullException(nameof(type));
             return type.IsValueType ? Activator.CreateInstance(type) : null;
         }
 

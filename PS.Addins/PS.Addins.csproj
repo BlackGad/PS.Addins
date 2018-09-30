@@ -40,18 +40,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Sources\ProxyConsumer.cs" />
-    <Compile Include="Sources\ProxyProducer.cs" />
-    <Compile Include="Sources\Adapters\Base\AddInHostSideAdapter.cs" />
-    <Compile Include="Sources\Adapters\Base\AddInHostSideAdapterDelegate.cs" />
-    <Compile Include="Sources\Adapters\SingleDomain\AddInPipelineSingleDomain.cs" />
-    <Compile Include="Sources\Host\AddInHost.cs" />
-    <Compile Include="Sources\Host\AddIn.cs" />
-    <Compile Include="Sources\Adapters\Base\AddInPipeline.cs" />
-    <Compile Include="Sources\Host\AddInInstance.cs" />
+    <Compile Include="Extensions\ObjectExtensions.cs" />
+    <Compile Include="Sources\Collections\Map.cs" />
+    <Compile Include="Sources\Linq\Expressions\Extensions\ExpressionExtensions.cs" />
+    <Compile Include="Sources\Pipelines\Base\IPipeline.cs" />
+    <Compile Include="Sources\Pipelines\DomainPipeline\DomainInvoker.cs" />
+    <Compile Include="Sources\Pipelines\DomainPipeline\DomainVault.cs" />
+    <Compile Include="Sources\Pipelines\DomainPipeline\Extensions\DomainExtensions.cs" />
+    <Compile Include="Sources\Pipelines\DomainPipeline\ObjectIdentifier.cs" />
+    <Compile Include="Sources\ProxyType.cs" />
     <Compile Include="Sources\Cache.cs" />
     <Compile Include="Extensions\TypeExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Sources\Pipelines\DirectPipeline.cs" />
+    <Compile Include="Sources\Pipelines\DomainPipeline\DomainPipeline.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
