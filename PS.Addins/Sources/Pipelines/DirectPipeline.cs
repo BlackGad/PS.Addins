@@ -1,49 +1,31 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
 using PS.Addins.Extensions;
 using PS.Addins.Pipelines.Base;
 
 namespace PS.Addins.Pipelines
 {
-    public class DirectPipeline<TInstance> : IDisposable,
-                                             IPipeline
+    public class DirectPipeline : IPipeline
     {
-        private readonly TInstance _instance;
+        #region IPipeline Members
 
-        #region Constructors
-
-        public DirectPipeline()
+        public T CreateObject<T>(string assemblyLocation, string typeName)
         {
-            _instance = Activator.CreateInstance<TInstance>();
+            var assembly = Assembly.LoadFrom(assemblyLocation);
+            var type = assembly.GetAssemblyTypes()
+                               .FirstOrDefault(t => string.Equals(t.FullName,
+                                                                  typeName,
+                                                                  StringComparison.InvariantCultureIgnoreCase));
+            if (type == null) throw new TypeLoadException($"Could not find '{typeName}'");
+            var instance = Activator.CreateInstance(type);
+            if (instance is T variable) return variable;
+
+            return ProxyType.Create<T>((method, args) => type.GetSimilarMethod(method).Invoke(instance, args));
         }
-
-        #endregion
-
-        #region IDisposable Members
 
         public void Dispose()
         {
-            if (_instance is IDisposable disposable) disposable.Dispose();
-        }
-
-        #endregion
-
-        #region IPipeline Members
-
-        public T Facade<T>()
-        {
-            return ProxyType.Create<T>(ProducerCallback);
-        }
-
-        #endregion
-
-        #region Members
-
-        private object ProducerCallback(MethodInfo method, object[] args)
-        {
-            return _instance.GetType()
-                            .GetSimilarMethod(method)
-                            .Invoke(_instance, args);
         }
 
         #endregion

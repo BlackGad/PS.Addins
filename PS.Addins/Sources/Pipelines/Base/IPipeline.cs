@@ -6,8 +6,7 @@ namespace PS.Addins.Pipelines.Base
     {
         #region Members
 
-        void Dispose();
-        T Facade<T>();
+        T CreateObject<T>(string assemblyLocation, string typeName);
 
         #endregion
     }

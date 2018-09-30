@@ -41,11 +41,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Extensions\ObjectExtensions.cs" />
+    <Compile Include="Sources\Collections\Map.cs" />
     <Compile Include="Sources\Linq\Expressions\Extensions\ExpressionExtensions.cs" />
     <Compile Include="Sources\Pipelines\Base\IPipeline.cs" />
-    <Compile Include="Sources\Pipelines\DomainPipeline\DomainPipelineClient.cs" />
-    <Compile Include="Sources\Pipelines\DomainPipeline\DomainPipelineDelegateIdentifier.cs" />
-    <Compile Include="Sources\Pipelines\DomainPipeline\DomainPipelineHostInvoker.cs" />
+    <Compile Include="Sources\Pipelines\DomainPipeline\DomainInvoker.cs" />
+    <Compile Include="Sources\Pipelines\DomainPipeline\DomainVault.cs" />
+    <Compile Include="Sources\Pipelines\DomainPipeline\Extensions\DomainExtensions.cs" />
+    <Compile Include="Sources\Pipelines\DomainPipeline\ObjectIdentifier.cs" />
     <Compile Include="Sources\ProxyType.cs" />
     <Compile Include="Sources\Cache.cs" />
     <Compile Include="Extensions\TypeExtensions.cs" />

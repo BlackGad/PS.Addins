@@ -12,9 +12,18 @@ namespace Host
         {
             try
             {
-                using (var pipeline = new DomainPipeline<Instance>())
+                //var assemblyLocation = typeof(RemoteInstance).Assembly.Location;
+                //var typeName = typeof(RemoteInstance).FullName;
+
+                var service = new HostService();
+
+                var assemblyLocation = @"d:\GitHub\PS.Addins\AddIn1\bin\Debug\AddIn1.dll";
+                var typeName = "AddIn1.AddIn1";
+
+                //using (var pipeline = new DirectPipeline())
+                using (var pipeline = new DomainPipeline())
                 {
-                    var facade = pipeline.Facade<IHostViewContract>();
+                    var facade = pipeline.CreateObject<IHostViewContract>(assemblyLocation, typeName);
 
                     void EventHandler(object sender, EventArgs eventArgs)
                     {
@@ -41,12 +50,25 @@ namespace Host
                     Console.WriteLine("Property result: " + facade.Property);
                     Console.WriteLine("Indexer result: " + facade[0]);
 
+                    Console.WriteLine("Spawn object...");
+                    var spawned = facade.SpawnObject();
+                    Console.WriteLine("Done.");
+
+                    Console.WriteLine("Execute spawned object method");
+                    spawned.Test();
+                    Console.WriteLine("Done.");
+
                     Console.WriteLine("Detaching event handler...");
                     facade.Event -= EventHandler;
                     Console.WriteLine("Done.");
 
                     Console.WriteLine("Raising event...");
                     facade.RaiseEvent();
+                    Console.WriteLine("Done.");
+
+                    Console.WriteLine("Starting service processing...");
+                    facade.SetService(service);
+                    facade.RaiseServiceCall();
                     Console.WriteLine("Done.");
                 }
             }

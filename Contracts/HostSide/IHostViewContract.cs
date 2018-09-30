@@ -24,6 +24,12 @@ namespace Contracts.HostSide
 
         void RaiseEvent();
 
+        int RaiseServiceCall();
+
+        void SetService(IHostService service);
+
+        ISpawnedObject SpawnObject();
+
         #endregion
     }
 }

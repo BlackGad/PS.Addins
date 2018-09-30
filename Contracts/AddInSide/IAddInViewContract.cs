@@ -24,6 +24,12 @@ namespace Contracts.AddInSide
 
         void RaiseEvent();
 
+        int RaiseServiceCall();
+
+        void SetService(IHostService service);
+
+        ISpawnedObject SpawnObject();
+
         #endregion
     }
 }
